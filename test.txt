@@ -1,0 +1,25 @@
+
+running 5 tests
+test manager::data::data::speculate_0::data::test_float_data_r_w ... ok
+test manager::data::data::speculate_0::data::test_int_data_r_w ... ok
+test manager::data::data::speculate_0::data::test_string_data_r_w ... ok
+test manager::io_for_db::io::speculate_1::module::test_u128_to_u32slice ... ok
+test manager::io_for_db::io::speculate_1::module::test_u32_to_slice ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test manager::data::data::speculate_0::data::test_float_data_r_w ... ok
+test manager::data::data::speculate_0::data::test_int_data_r_w ... ok
+test manager::data::data::speculate_0::data::test_string_data_r_w ... ok
+test manager::io_for_db::io::speculate_1::module::test_u128_to_u32slice ... ok
+test manager::io_for_db::io::speculate_1::module::test_u32_to_slice ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
