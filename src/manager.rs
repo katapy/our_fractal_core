@@ -1,5 +1,4 @@
 
-
 pub mod data;
 pub mod io_for_db;
 
@@ -12,9 +11,29 @@ pub mod manager {
 
     use std::error;
     use std::path::PathBuf;
+    use std::sync::Mutex;
+    use once_cell::sync::Lazy;
+    use std::env;
+    use dotenv::dotenv;
 
     type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
+    pub static GLOBAL_DATA: Lazy<Mutex<Manager>> = Lazy::new(|| {
+        dotenv().ok();
+        let path = env::var("path").expect("path is not found in env");
+        let table_name = env::var("table_name").expect("table_name is not found");
+        let data_name = env::var("data_name").expect("data_name is not found");
+        let path = &std::path::PathBuf::from(path);
+        let manager = Manager::new(path, table_name, data_name);
+        Mutex::new(manager)
+    });
+
+    /// get static manager
+    pub async fn static_manager<'a>() -> std::sync::MutexGuard<'static, Manager> {
+        GLOBAL_DATA.lock().unwrap()
+    }
+
+    /// OurFractal DB Manager.
     pub struct Manager {
         def_list: Vec<Definition>,
         parent_data: Data,
@@ -222,15 +241,7 @@ pub mod manager {
 
                 let def = self.get_def(&tag)?;
 
-                /*
-                let mut data = Data::read_data(self.get_def(&tag)?);
-                // Value
-                match self.get_def(&tag)?.get_type() {
-                    Type::Int => {data.value = vec![b.get_child()?.read_u32()?];},
-                    Type::Float => {data.value = vec![b.get_child()?.read_u32()?];},
-                    Type::String => { data.value = b.get_child()?.read_str_value()?},
-                }
-                */
+                // data value
                 let value = match def.get_type() {
                     Type::Int => b.get_child()?.read_u8_vec(4),
                     Type::Float => b.get_child()?.read_u8_vec(4),

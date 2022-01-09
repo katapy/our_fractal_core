@@ -59,6 +59,8 @@ pub mod data {
         }
 
         /// Create new data. It use when read binary data
+        /// * `def` - Data definition
+        /// * `value` - data value which type is binary.
         pub fn read_binary(def: Definition, value: Vec<u8>) -> Data {
             let children: Vec<Data> = Vec::new();
             Data {
@@ -100,7 +102,7 @@ pub mod data {
         }
 
         /// get child tag data mut
-        /// * `tags` - Child tags.
+        /// * `root` - data root.
         pub fn get_child_mut(&mut self, root: &DataRoot) -> Option<&mut Data>{
             if root.is_empty() {
                 Some(self)
@@ -117,7 +119,7 @@ pub mod data {
         }
 
         /// get child by index.
-        /// * `data` - data index.
+        /// * `index` - data index.
         pub fn get_child_mut_by_index(&mut self, index: &[usize]) -> Option<&mut Data> {
             if index.is_empty() {
                 Some(self)
