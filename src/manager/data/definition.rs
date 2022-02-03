@@ -1,7 +1,10 @@
 
 pub mod definition {
+
+    use serde::{Serialize, Deserialize};
+
     /// type in data value
-    #[derive (Clone, Copy, Debug)]
+    #[derive (Clone, Copy, Debug, Serialize, Deserialize)]
     pub enum Type {
         Int,
         Float,
@@ -20,12 +23,14 @@ pub mod definition {
     }
 
     /// Data definition
-    #[derive(Clone, Debug)]
+    #[derive(Clone, Debug, Serialize, Deserialize)]
     pub struct Definition {
         /// tag value.  
         /// The first 4 digits : the group number  
         /// The last 4 digits  : the element number.
         pub tag: u32,
+
+        pub name: String,
         /// value type
         pub data_type: Type,
         /// explanation
@@ -40,16 +45,22 @@ pub mod definition {
 
     impl Definition {
         // Create new definition
-        pub fn new(tag: u32, data_type: Type, is_multiple: bool) -> Definition {
+        pub fn new(tag: u32, name: String, data_type: Type, is_multiple: bool) -> Definition {
             let vec: Vec<u32> = Vec::new();
             Definition {
                 tag: tag,
+                name: name,
                 data_type: data_type,
                 explanation: format!(""),
                 is_multiple: is_multiple,
                 is_base: false,
                 children: vec,
             }
+        }
+
+        /// definition name
+        pub fn get_name(&self) -> &String {
+            &self.name
         }
 
         /// get type
@@ -97,19 +108,28 @@ pub mod definition {
         pub fn is_base(&self) -> bool {
             self.is_base
         }
+    }
 
-        /*
-        pub fn create() {
+    #[cfg(test)]
+    extern crate speculate;
 
+    #[cfg(test)]
+    use speculate::speculate;
+
+    // Test Command
+    // cargo test -- --test-threads=1 > test.txt
+    #[cfg(test)]
+    speculate! {
+        describe "definition" {
+            it "def name" {
+                let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+                assert_eq!(def.get_name(), &format!("Int test"));
+            }
+
+            it "def is base" {
+                let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+                assert_eq!(def.is_base(), false);
+            }
         }
-
-        pub fn alter(tag: u32, ) {
-
-        }
-        
-        pub fn drop() {
-
-        }
-        */
     }
 }
