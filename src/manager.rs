@@ -47,12 +47,13 @@ pub mod manager {
         /// * `table_name` - Data table name.
         /// * `data_name` - Data name.
         pub fn new(path: &PathBuf, table_name: String, data_name: String) -> Manager {
-            let def_list = vec![Definition::new(0x0000_0000, Type::String, false)];
+            let def_list = vec![Definition::new(0x0000_0000, format!("Parent Tag"), Type::String, false)];
             let children: Vec<u32> = Vec::new();
             let path_manager = PathManager::new(path.to_path_buf(), table_name, data_name.to_string());
             let data = Data::new(
                 Definition {
                     tag: 0x0000_0000,
+                    name: format!("Parent Tag"),
                     data_type: Type::String,
                     children: children,
                     explanation: String::new(),
@@ -73,11 +74,11 @@ pub mod manager {
         /// * `tags` - definition tag.
         /// * `data_typw` - definition data type.
         /// * `is_multiple` - definition data is able to multiple.
-        pub fn add_def(&mut self, tag: u32, data_type: Type, is_multiple: bool) -> Result<()> {
+        pub fn add_def(&mut self, tag: u32, name: String, data_type: Type, is_multiple: bool) -> Result<()> {
             if self.def_list.iter().find(|x| x.tag == tag).is_some() {
                 panic!("tag {:0x} is already defined", tag);
             }
-            self.def_list.push(Definition::new(tag, data_type, is_multiple));
+            self.def_list.push(Definition::new(tag, name, data_type, is_multiple));
             Ok(())
         }
 
@@ -94,6 +95,15 @@ pub mod manager {
         /// get definition by mut
         pub fn get_def_mut(&mut self, tag: &u32) -> Option<&mut Definition>{
             self.def_list.iter_mut().find(|x| x.tag == *tag)
+        }
+
+        /// get defined tag list.
+        pub fn get_def_tag_list(&self) -> Vec<u32> {
+            let mut vec = Vec::new();
+            for def in &self.def_list {
+                vec.push(def.tag);
+            }
+            vec
         }
 
         /// add child data.
@@ -123,6 +133,8 @@ pub mod manager {
                 b.get_child()?.add_start_data();
                 // Tag
                 b.get_child()?.add_u32(def.tag)?;
+
+                b.get_child()?.add_str(&def.name)?;
                 // Data type
                 b.get_child()?.add_u8(def.get_type_num());
                 // Is multiple
@@ -159,13 +171,15 @@ pub mod manager {
                 b.get_child()?.read_u8();
                 // Tag
                 let tag = b.get_child()?.read_u32()?;
+
+                let name = b.get_child()?.read_str()?;
                 // Data type
                 let data_type: Type = Type::u8_to_type(b.get_child()?.read_u8());
                 // Is multiple
                 let is_multiple = b.get_child()?.read_u8() != 0;
 
                 // make new definition structure.
-                let mut def = Definition::new(tag, data_type, is_multiple);
+                let mut def = Definition::new(tag, name, data_type, is_multiple);
 
                 // Explanation
                 def.explanation = b.get_child()?.read_str()?;
@@ -278,6 +292,30 @@ pub mod manager {
                 return Ok(true);
             }
             Ok(false)
+        }
+    }
+
+    #[cfg(test)]
+    extern crate speculate;
+
+    #[cfg(test)]
+    use speculate::speculate;
+
+    // Test Command
+    // cargo test -- --test-threads=1 > test.txt
+    #[cfg(test)]
+    speculate! {
+        describe "definition" {
+            it "tag list" {
+                let path = "./test";
+                let table_name = format!("test");
+                let data_name = format!("test");
+                let path = &std::path::PathBuf::from(path);
+                let mut manager = Manager::new(path, table_name, data_name);
+                manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
+                manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+                assert_eq!(manager.get_def_tag_list(), vec![0x0000_0000, 0xabcd_abcd, 0x1234_5678]);
+            }
         }
     }
 }
