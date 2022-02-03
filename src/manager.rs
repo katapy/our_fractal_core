@@ -97,13 +97,13 @@ pub mod manager {
             self.def_list.iter_mut().find(|x| x.tag == *tag)
         }
 
+        /// get defined tag list.
         pub fn get_def_tag_list(&self) -> Vec<u32> {
             let mut vec = Vec::new();
             for def in &self.def_list {
                 vec.push(def.tag);
             }
             vec
-            // self.def_list.clone()
         }
 
         /// add child data.
@@ -292,6 +292,30 @@ pub mod manager {
                 return Ok(true);
             }
             Ok(false)
+        }
+    }
+
+    #[cfg(test)]
+    extern crate speculate;
+
+    #[cfg(test)]
+    use speculate::speculate;
+
+    // Test Command
+    // cargo test -- --test-threads=1 > test.txt
+    #[cfg(test)]
+    speculate! {
+        describe "definition" {
+            it "tag list" {
+                let path = "./test";
+                let table_name = format!("test");
+                let data_name = format!("test");
+                let path = &std::path::PathBuf::from(path);
+                let mut manager = Manager::new(path, table_name, data_name);
+                manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
+                manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+                assert_eq!(manager.get_def_tag_list(), vec![0x0000_0000, 0xabcd_abcd, 0x1234_5678]);
+            }
         }
     }
 }
