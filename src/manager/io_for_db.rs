@@ -243,6 +243,7 @@ pub mod io {
         }
 
         /// read u8 vec data.
+        /// * `len` - data length.
         pub fn read_u8_vec(&mut self, len: usize) -> Vec<u8> {
             let vec = &self.buf[self.index..self.index + len];
             self.index += len;

@@ -8,9 +8,9 @@ use manager::data::definition::definition::{Definition, Type};
 #[tokio::main]
 async fn main() {
     let a = async{
-        static_manager().await.add_def(0xabcd_abcd, Type::Int, false).unwrap();
+        static_manager().await.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
         static_manager().await.get_def_mut(&0xabcd_abcd).unwrap().set_explanation(format!("test"));
-        static_manager().await.add_def(0x1234_5678, Type::Int, false).unwrap();
+        static_manager().await.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
         println!("{}", static_manager().await.get_def(&0xabcd_abcd).unwrap().explanation);
 
         static_manager().await.write_def().expect("Write def file error");
@@ -22,13 +22,13 @@ async fn main() {
         println!("{}", manager.get_def(&0xabcd_abcd).unwrap().explanation);
 
         static_manager().await.add_child(
-            Data::new(Definition::new(0xabcd_abcd, Type::Int, false), Box::new(3)).unwrap(), 
+            Data::new(Definition::new(0xabcd_abcd, format!("children test"), Type::Int, false), Box::new(3)).unwrap(), 
             &mut[]
         );
         println!("{:?}", static_manager().await.get_data(&[(0xabcd_abcd, None)]).unwrap().get_value().unwrap().downcast_ref::<i32>().unwrap());
 
         static_manager().await.add_child(
-            Data::new(Definition::new(0x1234_5678, Type::String, false), Box::new(format!("taro"))).unwrap(), 
+            Data::new(Definition::new(0x1234_5678, format!("string test"), Type::String, false), Box::new(format!("taro"))).unwrap(), 
             &mut[(0xabcd_abcd, None)]
         );
         println!("{:?}", static_manager().await.get_data(&[(0xabcd_abcd, None), (0x1234_5678, None)])
