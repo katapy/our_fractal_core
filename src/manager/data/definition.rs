@@ -99,6 +99,7 @@ pub mod definition {
             }
         }
 
+        /// get explanation about definition.
         pub fn get_explanation(&self) -> &String {
             &self.explanation
         }
