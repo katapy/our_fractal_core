@@ -99,6 +99,10 @@ pub mod definition {
             }
         }
 
+        pub fn get_explanation(&self) -> &String {
+            &self.explanation
+        }
+
         /// set explanation.
         /// * `explanation` - explanation of tag.
         pub fn set_explanation(&mut self, explanation: String) {
@@ -129,6 +133,12 @@ pub mod definition {
             it "def is base" {
                 let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
                 assert_eq!(def.is_base(), false);
+            }
+
+            it "explanation" {
+                let mut def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+                def.set_explanation(format!("exp test"));
+                assert_eq!(def.get_explanation(), &format!("exp test"));
             }
         }
     }
