@@ -134,6 +134,12 @@ pub mod definition {
                 let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
                 assert_eq!(def.is_base(), false);
             }
+
+            it "explanation" {
+                let mut def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+                def.set_explanation(format!("exp test"));
+                assert_eq!(def.get_explanation(), &format!("exp test"));
+            }
         }
     }
 }
