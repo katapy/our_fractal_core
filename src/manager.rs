@@ -8,30 +8,10 @@ pub mod manager {
     use crate::manager::data::data::{Data, DataRoot};
     use crate::manager::io_for_db::path_manager::path_manager::PathManager;
     use crate::manager::io_for_db::io::{BinaryManager, Mode, u128_to_slice};
-
     use std::error;
     use std::path::PathBuf;
-    use std::sync::Mutex;
-    use once_cell::sync::Lazy;
-    use std::env;
-    use dotenv::dotenv;
 
     type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
-
-    pub static GLOBAL_DATA: Lazy<Mutex<Manager>> = Lazy::new(|| {
-        dotenv().ok();
-        let path = env::var("path").expect("path is not found in env");
-        let table_name = env::var("table_name").expect("table_name is not found");
-        let data_name = env::var("data_name").expect("data_name is not found");
-        let path = &std::path::PathBuf::from(path);
-        let manager = Manager::new(path, table_name, data_name);
-        Mutex::new(manager)
-    });
-
-    /// get static manager
-    pub async fn static_manager<'a>() -> std::sync::MutexGuard<'static, Manager> {
-        GLOBAL_DATA.lock().unwrap()
-    }
 
     /// OurFractal DB Manager.
     pub struct Manager {
@@ -104,6 +84,25 @@ pub mod manager {
                 vec.push(def.tag);
             }
             vec
+        }
+
+        /// add child in definition.
+        /// * `tag` - parent definition tag.
+        /// * `child_tag` - child definition tag.
+        pub fn add_def_child(&mut self, tag: &u32, child_tag: u32) -> bool {
+            for child_def in &self.def_list {
+                if child_def.tag != child_tag {
+                    continue;
+                }
+                match self.get_def_mut(tag) {
+                    Some(def) => {
+                        def.children.push(child_tag);
+                        return true;
+                    },
+                    None => { return false; }
+                }
+            }
+            false
         }
 
         /// add child data.
@@ -315,6 +314,17 @@ pub mod manager {
                 manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
                 manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
                 assert_eq!(manager.get_def_tag_list(), vec![0x0000_0000, 0xabcd_abcd, 0x1234_5678]);
+            }
+            it "add definition child" {
+                let path = "./test";
+                let table_name = format!("test");
+                let data_name = format!("test");
+                let path = &std::path::PathBuf::from(path);
+                let mut manager = Manager::new(path, table_name, data_name);
+                manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
+                manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+                manager.add_def_child(&0xabcd_abcd, 0x1234_5678);
+                assert_eq!(manager.get_def(&0xabcd_abcd).unwrap().children, vec![0x1234_5678]);
             }
         }
     }

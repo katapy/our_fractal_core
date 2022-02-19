@@ -1,12 +1,14 @@
 
 pub mod manager;
 
-use manager::manager::{Manager, static_manager};
+// use manager::manager::{Manager, static_manager};
+use manager::manager::{Manager};
 use manager::data::data::Data;
 use manager::data::definition::definition::{Definition, Type};
 
 #[tokio::main]
 async fn main() {
+    /*
     let a = async{
         static_manager().await.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
         static_manager().await.get_def_mut(&0xabcd_abcd).unwrap().set_explanation(format!("test"));
@@ -39,4 +41,5 @@ async fn main() {
     };
 
     a.await
+    */
 }
