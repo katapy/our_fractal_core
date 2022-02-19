@@ -99,6 +99,10 @@ pub mod definition {
             }
         }
 
+        pub fn get_explanation(&self) -> &String {
+            &self.explanation
+        }
+
         /// set explanation.
         /// * `explanation` - explanation of tag.
         pub fn set_explanation(&mut self, explanation: String) {
