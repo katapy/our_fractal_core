@@ -1,2 +1,0 @@
-
-# OurFractal Data folder.

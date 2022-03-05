@@ -1,3 +1,4 @@
 
 # All of folder in files are ignore 
-./*
+*
+!/.gitignore
