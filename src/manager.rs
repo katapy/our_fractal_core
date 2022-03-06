@@ -158,8 +158,6 @@ pub mod manager {
             self.def_list = Vec::new();
             let mut binary_manager = BinaryManager::new();
             binary_manager.read_to_end(&self.path_manager.get_def_path()?)?;
-            // self.read_def_from_binary(&mut binary_manager)?;
-            // Ok(())
             match self.read_def_from_binary(&mut binary_manager) {
                 Ok(_) => Ok(()),
                 Err(e) => {
