@@ -13,16 +13,20 @@ pub mod reader {
 
     impl Reader {
         /// Open file.
-        pub fn open(path: &std::path::PathBuf) -> Reader {
-            let file = File::open(path).unwrap();
+        /// * `path` - File path.
+        pub fn open(path: &std::path::PathBuf) -> Result<Reader, std::io::Error> {
+            let file = File::open(path)?;
             let buf = Vec::new();
-            Reader{
-                file: file,
-                result: buf,
-            }
+            Ok(
+                Reader{
+                    file: file,
+                    result: buf,
+                }
+            )
         }
 
         /// Read file.
+        #[warn(dead_code)]
         pub fn read(&mut self) -> Result<usize, std::io::Error> {
             self.result = Vec::new();
             self.file.read(&mut self.result)
