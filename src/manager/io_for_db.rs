@@ -163,7 +163,7 @@ pub mod io {
         /// Read file data to end.
         /// * `path` - file path.
         pub fn read_to_end(&mut self, path: &PathBuf) -> Result<()> {
-            let mut reader = Reader::open(path);
+            let mut reader = Reader::open(path)?;
             reader.read_to_end()?;
             self.buf = reader.result;
             Ok(())
