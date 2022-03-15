@@ -155,15 +155,16 @@ pub mod io {
 
         /// Write buffer data
         /// * `data` - file path
-        pub fn write(&self, path: &PathBuf) {
-            let mut writer = Writer::create(path);
+        pub fn write(&self, path: &PathBuf) -> Result<()> {
+            let mut writer = Writer::create(path)?;
             writer.write(&self.buf);
+            Ok(())
         }
 
         /// Read file data to end.
         /// * `path` - file path.
         pub fn read_to_end(&mut self, path: &PathBuf) -> Result<()> {
-            let mut reader = Reader::open(path);
+            let mut reader = Reader::open(path)?;
             reader.read_to_end()?;
             self.buf = reader.result;
             Ok(())

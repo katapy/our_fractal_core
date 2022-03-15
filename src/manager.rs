@@ -154,10 +154,18 @@ pub mod manager {
 
         /// Read definition data from file
         pub fn read_def_from_file(&mut self) -> Result<()> {
+            let backup_def = self.def_list.clone();
+            self.def_list = Vec::new();
             let mut binary_manager = BinaryManager::new();
             binary_manager.read_to_end(&self.path_manager.get_def_path()?)?;
-            self.read_def_from_binary(&mut binary_manager)?;
-            Ok(())
+            match self.read_def_from_binary(&mut binary_manager) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    // If an error occurs, apply the backup data.
+                    self.def_list = backup_def;
+                    Err(e)
+                }
+            }
         }
 
         /// Read definition data from binary data.
@@ -216,6 +224,14 @@ pub mod manager {
             b.get_child()?.add_start_data();
             // Tag
             b.get_child()?.add_u32(data.get_def().tag)?;
+
+            // Value length (Only values ​​with undefined length.)
+            match data.get_def().data_type {
+                Type::String => {
+                    b.get_child()?.add_usize(data.get_bite_value().len())?;
+                }
+                _ => ()
+            };
 
             // Write value in file
             for bite in data.get_bite_value() {
