@@ -2,7 +2,7 @@
 pub mod writer {
 
     use std::fs::{File, OpenOptions};
-    use std::io::{Write, Result};
+    use std::io::{Write};
 
     /// Write file.
     pub struct Writer {
@@ -13,33 +13,32 @@ pub mod writer {
     impl Writer {
         /// Open file in write-read mode.
         /// This function panic when file does not exist.
-        pub fn open (path : &std::path::PathBuf) -> Writer {
+        pub fn open (path : &std::path::PathBuf) -> Result<Writer, std::io::Error> {
             let f = OpenOptions::new()
                 .read(true)
                 .write(true)
                 .create(true)
                 .append(true)
-                .open(path)
-                .expect("File open");
-            Writer {
+                .open(path)?;
+            Ok(Writer {
                 path: path.to_path_buf(),
                 file: f,
-            }
+            })
         }
 
-        /// Opens a file in write-only mode.
-        /// This function will create a file if it does not exist, and will truncate it if it does.
-        pub fn create (path : &std::path::PathBuf) -> Writer {
+        /// Opens a file in write-only mode. 
+        pub fn create (path : &std::path::PathBuf) -> Result<Writer, std::io::Error> {
             let f = OpenOptions::new()
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open(path)
-                .expect("File open");
-            Writer {
-                path: path.to_path_buf(),
-                file: f,
-            }
+                .open(path)?;
+            Ok(
+                Writer {
+                    path: path.to_path_buf(),
+                    file: f,
+                }
+            )
         }
 
         /// write on file
