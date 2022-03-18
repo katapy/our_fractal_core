@@ -68,7 +68,7 @@ pub mod io {
         pub fn get_child(&mut self) -> Result<&mut BinaryManager> {
             match self.child.iter_mut().find(|_| true) {
                 Some(child) => Ok(child),
-                None => { panic!("Child binary manager cannot found") },
+                None => Err("Child binary manager cannot found")?
             }
         }
 
@@ -203,7 +203,7 @@ pub mod io {
                 Ok(self.index)
             }
             else {
-                panic!("Check sum error!");
+                Err("Check sum error!")?
             }
         }
 

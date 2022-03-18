@@ -56,7 +56,7 @@ pub mod manager {
         /// * `is_multiple` - definition data is able to multiple.
         pub fn add_def(&mut self, tag: u32, name: String, data_type: Type, is_multiple: bool) -> Result<()> {
             if self.def_list.iter().find(|x| x.tag == tag).is_some() {
-                panic!("tag {:0x} is already defined", tag);
+                return Err(format!("tag {:0x} is already defined", tag))?
             }
             self.def_list.push(Definition::new(tag, name, data_type, is_multiple));
             Ok(())
@@ -68,7 +68,7 @@ pub mod manager {
             let d = self.def_list.iter().find(|x| x.tag == *tag);
             match d {
                 Some(def) => Ok(def),
-                None => {panic!("tag {:0x} is not defined", tag);},
+                None => Err(format!("tag {:0x} is not defined", tag))?,
             }
         }
 
@@ -135,7 +135,11 @@ pub mod manager {
 
                 b.get_child()?.add_str(&def.name)?;
                 // Data type
-                b.get_child()?.add_u8(def.get_type_num());
+                match def.get_type_num() {
+                    Some(data_type) => b.get_child()?.add_u8(data_type),
+                    None => { return Err("Data type could not get")? },
+                }
+                
                 // Is multiple
                 b.get_child()?.add_bool(def.is_multiple);
                 // Explanation
@@ -148,7 +152,7 @@ pub mod manager {
                 // ETX, Check sum
                 b.end_child_and_add_data()?;
             }
-            b.write(&self.path_manager.get_def_path()?);
+            b.write(&self.path_manager.get_def_path()?)?;
             Ok(())
         }
 
@@ -245,7 +249,7 @@ pub mod manager {
 
             // ETX, Check sum
             b.end_child_and_add_data()?;
-            b.write(&self.path_manager.get_data_path()?);
+            b.write(&self.path_manager.get_data_path()?)?;
             Ok(())
         }
 
@@ -283,20 +287,25 @@ pub mod manager {
                         vec.append(vec2);
                         vec
                     },
+                    Type::Err => return Err("Definition type error.")?
                 };
 
                 let data = Data::read_binary(def.clone(), value);
 
                 // add data in parent.
-                let parent = self.parent_data.get_child_mut_by_index(index)
-                    .expect("Fail to read tag from file.");
-                parent.add_child(&mut [], data);
+                match self.parent_data.get_child_mut_by_index(index){
+                    Some(p) => {
+                        let parent = p;
+                        parent.add_child(&mut [], data);
 
-                // Children
-                let mut index_vec = index.to_vec();
-                index_vec.push(parent.get_children().len() - 1);
-                while self.read_child_data(&mut index_vec, b.get_child()?)? {
-                    continue;
+                        // Children
+                        let mut index_vec = index.to_vec();
+                        index_vec.push(parent.get_children().len() - 1);
+                        while self.read_child_data(&mut index_vec, b.get_child()?)? {
+                            continue;
+                        }
+                    }
+                    None => { Err("Fail to read tag from file.")?; },
                 }
 
                 // ETX

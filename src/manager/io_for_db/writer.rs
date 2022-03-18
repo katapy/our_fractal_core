@@ -12,7 +12,6 @@ pub mod writer {
 
     impl Writer {
         /// Open file in write-read mode.
-        /// This function panic when file does not exist.
         pub fn open (path : &std::path::PathBuf) -> Result<Writer, std::io::Error> {
             let f = OpenOptions::new()
                 .read(true)
