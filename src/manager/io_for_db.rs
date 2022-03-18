@@ -327,13 +327,11 @@ pub mod io {
     #[cfg(test)]
     speculate! {
 
-        use std::{thread, time};
-        use rstest::rstest;
-
         describe "module" {
             it "u32 to slice" {
                 let tag: u32 = 0x2010_0010;
                 let mut buf: Vec<u8> = Vec::new();
+                #[warn(unused_must_use)]
                 u32_to_slice(tag, &mut buf, 24);
                 assert_eq!(buf, vec![0x20, 0x10, 0x00, 0x10]);
             }
@@ -341,6 +339,7 @@ pub mod io {
             it "u128 to u32slice" {
                 let tag: u128 = 0x1010_0010_2010_0010_3010_0010_4010_0010;
                 let mut buf: Vec<u32> = Vec::new();
+                #[warn(unused_must_use)]
                 u128_to_u32slice(tag, &mut buf, 96);
                 assert_eq!(buf, vec![0x1010_0010, 0x2010_0010, 0x3010_0010, 0x4010_0010]);
             }
