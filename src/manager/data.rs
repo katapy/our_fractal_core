@@ -1,14 +1,12 @@
 
 pub mod definition;
 
-use definition::definition::{Definition, Type};
-
 pub mod data {
 
     use crate::manager::data::definition::definition::{Definition, Type};
 
     use std::error;
-    use std::any::{Any, TypeId};
+    use std::any::{Any};
 
     // Change the alias to `Box<dyn error::Error>`.
     type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
@@ -35,7 +33,7 @@ pub mod data {
                             value: value.to_le_bytes().to_vec(),
                             children: children,
                     }}),
-                    None => { panic!("Cannot convert to float"); },
+                    None => return Err(format!("Cannot convert to int"))?,
                 },
                 Type::Float => match &(*boxed_value).downcast_ref::<f32>() {
                     Some(value) => Ok({
@@ -44,7 +42,7 @@ pub mod data {
                             value:  value.to_le_bytes().to_vec(),
                             children:children,
                     }}),
-                    None => { panic!("Cannot convert to float"); },
+                    None => return Err(format!("Cannot convert to float"))?,
                 },
                 Type::String => match &(*boxed_value).downcast_ref::<String>() {
                     Some(value) => Ok({
@@ -53,8 +51,9 @@ pub mod data {
                             value: value.as_bytes().to_vec(),
                             children: children,
                     }}),
-                    None => { panic!("Cannot convert to float"); },
+                    None => return Err(format!("Cannot convert to string"))?,
                 },
+                Type::Err => return Err(format!("Definition is incorrect"))?
             }
         }
 
@@ -81,6 +80,7 @@ pub mod data {
                 Type::Int => Ok(Box::new(i32::from_le_bytes(self.value[0..4].try_into()?))),
                 Type::Float => Ok(Box::new(f32::from_le_bytes(self.value[0..4].try_into()?))),
                 Type::String => Ok(Box::new(String::from_utf8(self.value.clone())?)),
+                Type::Err => Err("Data type is incorrect.")?
             }
         }
 

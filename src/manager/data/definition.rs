@@ -9,6 +9,7 @@ pub mod definition {
         Int,
         Float,
         String,
+        Err,
     }
 
     impl Type {
@@ -17,7 +18,7 @@ pub mod definition {
                 0x00 => Type::Int,
                 0x01 => Type::Float,
                 0x02 => Type::String,
-                _ => panic!("convert error"),
+                _ => Type::Err,
             }
         }
     }
@@ -91,11 +92,12 @@ pub mod definition {
         }
 
         /// get type by binary.
-        pub fn get_type_num(&self) -> u8 {
+        pub fn get_type_num(&self) -> Option<u8> {
             match self.data_type {
-                Type::Int => 0x00,
-                Type::Float => 0x01,
-                Type::String => 0x02,
+                Type::Int => Some(0x00),
+                Type::Float => Some(0x01),
+                Type::String => Some(0x02),
+                Type::Err => None,
             }
         }
 
