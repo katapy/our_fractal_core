@@ -116,33 +116,4 @@ pub mod definition {
             self.is_base
         }
     }
-
-    #[cfg(test)]
-    extern crate speculate;
-
-    #[cfg(test)]
-    use speculate::speculate;
-
-    // Test Command
-    // cargo test -- --test-threads=1 > test.txt
-    #[cfg(test)]
-    speculate! {
-        describe "definition" {
-            it "def name" {
-                let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
-                assert_eq!(def.get_name(), &format!("Int test"));
-            }
-
-            it "def is base" {
-                let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
-                assert_eq!(def.is_base(), false);
-            }
-
-            it "explanation" {
-                let mut def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
-                def.set_explanation(format!("exp test"));
-                assert_eq!(def.get_explanation(), &format!("exp test"));
-            }
-        }
-    }
 }
