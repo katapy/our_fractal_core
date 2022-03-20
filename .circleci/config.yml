@@ -4,6 +4,8 @@ jobs:
   build:
     docker:
       - image: circleci/rust
+
+    working_directory: ~/work
     steps:
       - checkout
       - run: cargo --version
@@ -13,21 +15,17 @@ jobs:
       - run:
           name: Run test
           command: "cargo test" 
-
-jobs:
-  build:
-    working_directory: /artifacts
-    steps:
       - run:
-          name: Creating Dummy Artifacts
+          name: cargo install grcov
+          command: cargo install grcov
+      - run:
+          name: Run coverage
           command: |
-            echo "my artifact file" > /tmp/art-1;
-            mkdir /tmp/artifacts;
-            echo "my artifact files in a dir" > /tmp/artifacts/art-2;
+            cargo +nightly build --verbose
+            cargo +nightly test --verbose
 
+            mkdir -p /report
+            grcov ./target/debug/deps -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
+            genhtml -o report/ --show-details --highlight --ignore-errors source --legend lcov.info
       - store_artifacts:
-          path: /tmp/art-1
-          destination: artifact-file
-
-      - store_artifacts:
-          path: /tmp/artifacts
+          path: /report
