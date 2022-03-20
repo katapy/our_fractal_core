@@ -13,6 +13,9 @@ jobs:
       - run:
           name: Run test
           command: "cargo test"
+       - run:
+          name: apt-get
+          command: sudo apt-get update && sudo apt-get -y install lcov ruby 
       - run:
           name: cargo install grcov
           command: |
