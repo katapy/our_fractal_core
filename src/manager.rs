@@ -4,7 +4,7 @@ pub mod io_for_db;
 
 pub mod manager {
     
-    use crate::manager::data::definition::definition::{Definition, Type};
+    use crate::manager::data::definition::definition::{Definition, Type, Child};
     use crate::manager::data::data::{Data, DataRoot};
     use crate::manager::io_for_db::path_manager::path_manager::PathManager;
     use crate::manager::io_for_db::io::{BinaryManager, Mode, u128_to_slice};
@@ -28,7 +28,8 @@ pub mod manager {
         /// * `data_name` - Data name.
         pub fn new(path: &PathBuf, table_name: String, data_name: String) -> Manager {
             let def_list = vec![Definition::new(0x0000_0000, format!("Parent Tag"), Type::String, false)];
-            let children: Vec<u32> = Vec::new();
+            // let children: Vec<u32> = Vec::new();
+            let children: Vec<Child> = Vec::new();
             let path_manager = PathManager::new(path.to_path_buf(), table_name, data_name.to_string());
             let data = Data::new(
                 Definition {
@@ -89,14 +90,14 @@ pub mod manager {
         /// add child in definition.
         /// * `tag` - parent definition tag.
         /// * `child_tag` - child definition tag.
-        pub fn add_def_child(&mut self, tag: &u32, child_tag: u32) -> bool {
+        pub fn add_def_child(&mut self, tag: &u32, child: Child) -> bool {
             for child_def in &self.def_list {
-                if child_def.tag != child_tag {
+                if child_def.tag != child.tag {
                     continue;
                 }
                 match self.get_def_mut(tag) {
                     Some(def) => {
-                        def.children.push(child_tag);
+                        def.children.push(child);
                         return true;
                     },
                     None => { return false; }
@@ -108,13 +109,13 @@ pub mod manager {
         /// add child data.
         /// * `data` - added data.
         /// * `root` - child data root.
-        pub fn add_child(&mut self, data: Data, root: &mut DataRoot) {
-            self.parent_data.add_child(root, data);
+        pub fn add_child(&mut self, data: &mut Data, root: Vec<&DataRoot>, id_data: Option<Data>) {
+            self.parent_data.add_child(root, data, id_data);
         }
 
         /// get data.
         /// * `root` - data root.
-        pub fn get_data(&self, root: &DataRoot) -> Option<&Data> {
+        pub fn get_data(&self, root: Vec<&DataRoot>) -> Option<&Data> {
             self.parent_data.get_child(root)
         }
 
@@ -147,7 +148,9 @@ pub mod manager {
                 // Children tags.
                 b.get_child()?.add_usize(def.children.len())?;
                 for child in &def.children {
-                    b.get_child()?.add_u32(*child)?;
+                    b.get_child()?.add_u32((*child).tag)?;
+
+                    b.get_child()?.add_u8((*child).get_multi_type_u8_num()?)
                 }
                 // ETX, Check sum
                 b.end_child_and_add_data()?;
@@ -196,7 +199,9 @@ pub mod manager {
                 def.explanation = b.get_child()?.read_str()?;
                 // Children Tags
                 for _ in 0..b.get_child()?.read_u128()? as usize {
-                    def.children.push(b.get_child()?.read_u32()?);
+                    let tag = b.get_child()?.read_u32()?;
+                    def.children.push(
+                        Child::create_by_binary(tag, b.get_child()?.read_u8()));
                 }
                 // ETX
                 b.get_child()?.read_u8();
@@ -290,13 +295,13 @@ pub mod manager {
                     Type::Err => return Err("Definition type error.")?
                 };
 
-                let data = Data::read_binary(def.clone(), value);
+                let mut data = Data::read_binary(def.clone(), value);
 
                 // add data in parent.
                 match self.parent_data.get_child_mut_by_index(index){
                     Some(p) => {
                         let parent = p;
-                        parent.add_child(&mut [], data);
+                        parent.add_child(vec![], &mut data, None);
 
                         // Children
                         let mut index_vec = index.to_vec();

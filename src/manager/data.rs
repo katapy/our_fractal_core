@@ -2,7 +2,6 @@
 pub mod definition;
 
 pub mod data {
-
     use crate::manager::data::definition::definition::{Definition, Type};
 
     use std::error;
@@ -10,9 +9,14 @@ pub mod data {
 
     // Change the alias to `Box<dyn error::Error>`.
     type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
-    /// Data root type. It use by search and/or specify data.
-    pub type DataRoot = [(u32, Option<Data>)];
 
+    #[derive (Clone, Debug)]
+    pub struct DataRoot {
+        pub tag: u32,
+        pub id_data: Option<Data>,
+    }
+
+    #[derive (Clone, Debug)]
     pub struct Data {
         def: Definition,
         value: Vec<u8>,
@@ -86,34 +90,34 @@ pub mod data {
 
         /// get child tag data
         /// * `tags` - tag and child data pairs.
-        pub fn get_child(&self, root: &DataRoot) -> Option<&Data>{
+        pub fn get_child(&self, root: Vec<&DataRoot>) -> Option<&Data>{
             if root.is_empty() {
                 Some(&self)
             }
             else {
-                match &root[0].1 {
+                match &root[0].id_data {
                     // Selects the values ​​requested by the tag that have the same tuple data.
-                    Some(data) => self.children.iter().find(|e| 
-                        e.def.tag==root[0].0 && e.is_equal_child(data))?.get_child(&root[1..]),
+                    Some(id_data) => self.children.iter().find(|e| 
+                        e.def.tag==root[0].tag && e.is_equal_child(id_data))?.get_child(root[1..].to_vec()),
                     // Select the values ​​requested by the tag if tuple data is None.
-                    None => self.children.iter().find(|e| e.def.tag==root[0].0)?.get_child(&root[1..])
+                    None => self.children.iter().find(|e| e.def.tag==root[0].tag)?.get_child(root[1..].to_vec())
                 }
             }
         }
 
         /// get child tag data mut
         /// * `root` - data root.
-        pub fn get_child_mut(&mut self, root: &DataRoot) -> Option<&mut Data>{
+        pub fn get_child_mut(&mut self, root: Vec<&DataRoot>) -> Option<&mut Data>{
             if root.is_empty() {
                 Some(self)
             }
             else {
-                match &root[0].1 {
+                match &root[0].id_data {
                     // Selects the values ​​requested by the tag that have the same tuple data.
                     Some(data) => self.children.iter_mut().find(|e| 
-                        e.def.tag==root[0].0 && e.is_equal_child(data))?.get_child_mut(&root[1..]),
+                        e.def.tag==root[0].tag && e.is_equal_child(data))?.get_child_mut(root[1..].to_vec()),
                     // Select the values ​​requested by the tag if tuple data is None.
-                    None => self.children.iter_mut().find(|e| e.def.tag==root[0].0)?.get_child_mut(&root[1..])
+                    None => self.children.iter_mut().find(|e| e.def.tag==root[0].tag)?.get_child_mut(root[1..].to_vec())
                 }
             }
         }
@@ -132,7 +136,7 @@ pub mod data {
 
         /// Return true if this child and data value is same.
         /// * `data` - Compared data.
-        pub fn is_equal_child(&self, data: &Data) -> bool {
+        fn is_equal_child(&self, data: &Data) -> bool {
             match self.children.iter().find(|e| e.def.tag==data.def.tag) {
                 Some(child) => data.value == child.value,
                 None => false,
@@ -141,8 +145,12 @@ pub mod data {
 
         /// Add child data in this.
         /// * `data` - Input data for child.
-        pub fn add_child(&mut self, root: &mut DataRoot, data: Data) {
-            self.get_child_mut(root).unwrap().children.push(data);
+        pub fn add_child(&mut self, root: Vec<&DataRoot>, data: &mut Data, id_data: Option<Data>) {
+            match id_data {
+                Some(id_data) => data.children.push(id_data.clone()),
+                None => (),
+            }
+            self.get_child_mut(root).unwrap().children.push(data.clone());
         }
 
         /// get children

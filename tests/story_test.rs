@@ -1,7 +1,7 @@
 
 extern crate our_fractal_core;
 
-use our_fractal_core::{Manager, Data, Type};
+use our_fractal_core::{Manager, Data, Type, Child, MultiType, DataRoot};
 use std::path::PathBuf; 
 
 #[cfg(test)]
@@ -23,7 +23,7 @@ speculate! {
             // 2. Add definition.
             manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int, false).unwrap();
             manager.add_def(0x1234_5678, format!("1234 data"), Type::String, false).unwrap();
-            manager.get_def_mut(&0xabcd_abcd).unwrap().children.push(0x1234_5678);
+            manager.get_def_mut(&0xabcd_abcd).unwrap().children.push(Child::create(0x1234_5678, MultiType::Single));
 
             // 3. R/W definition on binary file.
             manager.write_def().unwrap();
@@ -34,28 +34,42 @@ speculate! {
             println!("Def2[0x1234_5678]: {:?}", manager.get_def(&0x1234_5678).unwrap());
 
             // 5. Add child data.
+            let child = DataRoot {
+                tag: 0xabcd_abcd,
+                id_data: None
+            };
             manager.add_child(
-                Data::new( 
+                &mut Data::new( 
                     (*manager.get_def(&0xabcd_abcd).unwrap()).clone(), 
                     Box::new(3)
                 ).unwrap(),
-                &mut[]
+                vec![], 
+                None
             );
             manager.add_child(
-                Data::new(
+                &mut Data::new(
                     (*manager.get_def(&0x1234_5678).unwrap()).clone(), 
                     Box::new(format!("taro"))).unwrap(), 
-                &mut[(0xabcd_abcd, None)]
+                vec![&child.clone()],
+                None
             );
 
             // 6. R/W data on binary file.
             manager.write_data().unwrap();
             manager.read_data().unwrap();
 
+            let child1 = DataRoot {
+                tag: 0xabcd_abcd,
+                id_data: None,
+            };
+            let child2 = DataRoot {
+                tag: 0x1234_5678,
+                id_data: None,
+            };
             // 7. Check data.
-            assert_eq!(manager.get_data(&[(0xabcd_abcd, None)])
+            assert_eq!(manager.get_data(vec![&child1.clone()])
                 .unwrap().get_value().unwrap().downcast_ref::<i32>().unwrap(), &3);
-            assert_eq!(manager.get_data(&[(0xabcd_abcd, None), (0x1234_5678, None)])
+            assert_eq!(manager.get_data(vec![&child1.clone(), &child2.clone()])
                 .unwrap().get_value().unwrap().downcast_ref::<String>().unwrap(), "taro");
         }
     }

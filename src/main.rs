@@ -4,9 +4,11 @@ pub mod manager;
 // use manager::manager::{Manager, static_manager};
 use manager::manager::{Manager};
 use manager::data::data::Data;
-use manager::data::definition::definition::{Definition, Type};
+use manager::data::definition::definition::{Definition, Type, Child};
 
 use std::path::PathBuf;
+
+use crate::manager::data::definition::definition::MultiType;
 
 #[tokio::main]
 async fn main() {
@@ -54,7 +56,7 @@ async fn main() {
     // 2. Add definition.
     manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int, false).unwrap();
     manager.add_def(0x1234_5678, format!("1234 data"), Type::String, false).unwrap();
-    manager.get_def_mut(&0xabcd_abcd).unwrap().children.push(0x1234_5678);
+    manager.add_def_child(&0xabcd_abcd, Child::create(0x1234_5678, MultiType::Single));
 
     // 3. R/W definition on binary file.
     manager.write_def().unwrap();
@@ -65,18 +67,22 @@ async fn main() {
     println!("Def2[0x1234_5678]: {:?}", manager.get_def(&0x1234_5678).unwrap());
 
     // 5. Add child data.
+    let mut vec: &mut Vec<Child> = &mut Vec::new();
     manager.add_child(
-        Data::new( 
+        &mut Data::new( 
             (*manager.get_def(&0xabcd_abcd).unwrap()).clone(), 
             Box::new(3)
         ).unwrap(),
-        &mut[]
+        vec![], 
+        None
     );
+    // let mut vec2: &mut Vec<Child> = &mut &Vec::new();
     manager.add_child(
-        Data::new(
+        &mut Data::new(
             (*manager.get_def(&0x1234_5678).unwrap()).clone(), 
             Box::new(format!("taro"))).unwrap(), 
-        &mut[(0xabcd_abcd, None)]
+            vec![],
+        None
     );
 
     // 6. R/W data on binary file.
@@ -84,8 +90,10 @@ async fn main() {
     manager.read_data().unwrap();
 
     // 7. Check data.
+    /*
     println!("child1: {:?}", manager.get_data(&[(0xabcd_abcd, None)])
             .unwrap().get_value().unwrap().downcast_ref::<i32>().unwrap());
     println!("child2: {:?}", manager.get_data(&[(0xabcd_abcd, None), (0x1234_5678, None)])
             .unwrap().get_value().unwrap().downcast_ref::<String>().unwrap());
+    */
 }

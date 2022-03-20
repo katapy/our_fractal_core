@@ -1,7 +1,44 @@
 
 pub mod definition {
 
+    use std::error;
+
     use serde::{Serialize, Deserialize};
+
+    type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
+
+    #[derive(Debug, Clone)]
+    pub struct Child {
+        pub tag: u32,
+        pub multi_type: MultiType,
+    }
+
+    impl Child {
+        pub fn get_multi_type_u8_num(&self) -> Result<u8> {
+            match self.multi_type {
+                MultiType::Single => Ok(0x00),
+                _ => Err("Multi type convert error")?
+            }
+        }
+
+        pub fn create(tag: u32, multu_type: MultiType) -> Child {
+            Child {
+                tag: tag,
+                multi_type: multu_type,
+            }
+        }
+
+        pub fn create_by_binary(tag: u32, multi_type_binnary: u8) -> Child {
+            let multi_type = match multi_type_binnary {
+                0x00 => MultiType::Single,
+                _ => MultiType::Err
+            };
+            Child {
+                tag: tag,
+                multi_type: multi_type,
+            }
+        }
+    }
 
     /// type in data value
     #[derive (Clone, Copy, Debug, Serialize, Deserialize)]
@@ -23,8 +60,25 @@ pub mod definition {
         }
     }
 
+    #[derive (Clone, Copy, Debug, Serialize, Deserialize)]
+    pub enum MultiType {
+        Single,
+        Dictionary,
+        Err,
+    }
+
+
+    impl MultiType {
+        pub fn u8_to_multi_type(buf: u8) -> MultiType {
+            match buf {
+                0x00 => MultiType::Single,
+                _ => MultiType::Err,
+            }
+        }
+    }
+
     /// Data definition
-    #[derive(Clone, Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone)]
     pub struct Definition {
         /// tag value.  
         /// The first 4 digits : the group number  
@@ -41,13 +95,13 @@ pub mod definition {
 
         pub is_base: bool,
         /// tag number of children
-        pub children: Vec<u32>,
+        pub children: Vec<Child>,
     }
 
     impl Definition {
         // Create new definition
         pub fn new(tag: u32, name: String, data_type: Type, is_multiple: bool) -> Definition {
-            let vec: Vec<u32> = Vec::new();
+            let vec: Vec<Child> = Vec::new();
             Definition {
                 tag: tag,
                 name: name,
@@ -55,6 +109,7 @@ pub mod definition {
                 explanation: format!(""),
                 is_multiple: is_multiple,
                 is_base: false,
+                // children: vec,
                 children: vec,
             }
         }
