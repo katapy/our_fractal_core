@@ -15,4 +15,9 @@ jobs:
           command: "cargo test"
       - run:
           name: Run coverage
-          command: bash test_coverage.sh
+          command: |
+            cargo +nightly build --verbose
+            cargo +nightly test --verbose
+
+            grcov ./target/debug/deps -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
+            genhtml -o report/ --show-details --highlight --ignore-errors source --legend lcov.info
