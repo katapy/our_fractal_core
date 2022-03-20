@@ -11,5 +11,8 @@ jobs:
           name: rustup install nightly
           command: rustup install nightly
       - run:
-          name: テストの実行
+          name: Run test
           command: "cargo test"
+      - run:
+          name: Run coverage
+          command: bash test_coverage.sh
