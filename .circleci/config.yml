@@ -7,6 +7,7 @@ jobs:
     steps:
       - checkout
       - run: cargo --version
+      - run: rustup default nightly
       - run:
           name: テストの実行
           command: "cargo test"
