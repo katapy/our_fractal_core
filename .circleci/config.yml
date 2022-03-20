@@ -1,0 +1,15 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/rust
+    steps:
+      - checkout
+      - run: cargo --version
+      - run:
+          name: rustup install nightly
+          command: rustup install nightly
+      - run:
+          name: テストの実行
+          command: "cargo test"
