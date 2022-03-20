@@ -14,6 +14,11 @@ jobs:
           name: Run test
           command: "cargo test"
       - run:
+          name: cargo install grcov
+          command: |
+            sudo gem install coveralls-lcov
+            cargo install grcov
+      - run:
           name: Run coverage
           command: |
             cargo +nightly build --verbose
