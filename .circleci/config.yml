@@ -12,15 +12,10 @@ jobs:
           command: rustup install nightly
       - run:
           name: Run test
-          command: "cargo test"
-       - run:
-          name: apt-get
-          command: sudo apt-get update && sudo apt-get -y install lcov ruby 
+          command: "cargo test" 
       - run:
           name: cargo install grcov
-          command: |
-            sudo gem install coveralls-lcov
-            cargo install grcov
+          command: cargo install grcov
       - run:
           name: Run coverage
           command: |
