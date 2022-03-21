@@ -15,18 +15,3 @@ jobs:
       - run:
           name: Run test
           command: "cargo test" 
-      - run:
-          name: cargo install grcov
-          command: cargo install grcov
-      - run:
-          name: Run coverage
-          command: |
-            cargo +nightly build --verbose
-            cargo +nightly test --verbose
-
-            mkdir -p ~/report
-            grcov ./target/debug/deps -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
-            cp ./lcov.info ~/report
-            # genhtml -o ~/report/ --show-details --highlight --ignore-errors source --legend ~/report/lcov.info
-      - store_artifacts:
-          path: /report
