@@ -54,8 +54,8 @@ async fn main() {
     let mut manager: Manager = Manager::new(path, "data_test".to_string(), "data_name".to_string());
 
     // 2. Add definition.
-    manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int, false).unwrap();
-    manager.add_def(0x1234_5678, format!("1234 data"), Type::String, false).unwrap();
+    manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int).unwrap();
+    manager.add_def(0x1234_5678, format!("1234 data"), Type::String).unwrap();
     manager.add_def_child(&0xabcd_abcd, Child::create(0x1234_5678, MultiType::Single));
 
     // 3. R/W definition on binary file.
@@ -76,7 +76,6 @@ async fn main() {
         vec![], 
         None
     );
-    // let mut vec2: &mut Vec<Child> = &mut &Vec::new();
     manager.add_child(
         &mut Data::new(
             (*manager.get_def(&0x1234_5678).unwrap()).clone(), 

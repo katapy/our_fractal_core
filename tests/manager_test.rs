@@ -18,8 +18,8 @@ speculate! {
             let data_name = format!("test");
             let path = &std::path::PathBuf::from(path);
             let mut manager = Manager::new(path, table_name, data_name);
-            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
-            manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int).unwrap();
+            manager.add_def(0x1234_5678, format!("child test"), Type::Int).unwrap();
             assert_eq!(manager.get_def_tag_list(), vec![0x0000_0000, 0xabcd_abcd, 0x1234_5678]);
         }
         it "add definition child" {
@@ -28,8 +28,8 @@ speculate! {
             let data_name = format!("test");
             let path = &std::path::PathBuf::from(path);
             let mut manager = Manager::new(path, table_name, data_name);
-            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
-            manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int).unwrap();
+            manager.add_def(0x1234_5678, format!("child test"), Type::Int).unwrap();
             manager.add_def_child(&0xabcd_abcd, Child::create(0x1234_5678, MultiType::Single));
             assert_eq!(manager.get_def(&0xabcd_abcd).unwrap().children[0].tag, 0x1234_5678);
         }
@@ -40,10 +40,10 @@ speculate! {
             let data_name = format!("test");
             let path = &std::path::PathBuf::from(path);
             let mut manager = Manager::new(path, table_name, data_name);
-            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int, false).unwrap();
-            manager.add_def(0x1234_5678, format!("child test"), Type::Int, false).unwrap();
+            manager.add_def(0xabcd_abcd, format!("Int test"), Type::Int).unwrap();
+            manager.add_def(0x1234_5678, format!("child test"), Type::Int).unwrap();
 
-            manager.add_def(0x0000_0020, format!("Dictinary ID"), Type::String, false).unwrap();
+            manager.add_def(0x0000_0020, format!("Dictinary ID"), Type::String).unwrap();
 
             manager.add_def_child(&0xabcd_abcd, Child::create(0x1234_5678, MultiType::Dictionary));
             

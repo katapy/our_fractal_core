@@ -4,6 +4,8 @@ jobs:
   build:
     docker:
       - image: circleci/rust
+
+    working_directory: ~/work
     steps:
       - checkout
       - run: cargo --version
@@ -11,5 +13,5 @@ jobs:
           name: rustup install nightly
           command: rustup install nightly
       - run:
-          name: テストの実行
-          command: "cargo test"
+          name: Run test
+          command: "cargo test" 

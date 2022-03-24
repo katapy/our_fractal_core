@@ -27,7 +27,8 @@ pub mod manager {
         /// * `table_name` - Data table name.
         /// * `data_name` - Data name.
         pub fn new(path: &PathBuf, table_name: String, data_name: String) -> Manager {
-            let def_list = vec![Definition::new(0x0000_0000, format!("Parent Tag"), Type::String, false)];
+            // let def_list = vec![Definition::new(0x0000_0000, format!("Parent Tag"), Type::String, false)];
+            let def_list = vec![Definition::new(0x0000_0000, format!("Parent Tag"), Type::String)];
             // let children: Vec<u32> = Vec::new();
             let children: Vec<Child> = Vec::new();
             let path_manager = PathManager::new(path.to_path_buf(), table_name, data_name.to_string());
@@ -39,7 +40,7 @@ pub mod manager {
                     children: children,
                     explanation: String::new(),
                     is_base: true,
-                    is_multiple: true,
+                    // is_multiple: true,
                 }, 
                 Box::new(data_name)
             ).unwrap();
@@ -55,11 +56,13 @@ pub mod manager {
         /// * `tags` - definition tag.
         /// * `data_typw` - definition data type.
         /// * `is_multiple` - definition data is able to multiple.
-        pub fn add_def(&mut self, tag: u32, name: String, data_type: Type, is_multiple: bool) -> Result<()> {
+        // pub fn add_def(&mut self, tag: u32, name: String, data_type: Type, is_multiple: bool) -> Result<()> {
+        pub fn add_def(&mut self, tag: u32, name: String, data_type: Type ) -> Result<()> {
             if self.def_list.iter().find(|x| x.tag == tag).is_some() {
                 return Err(format!("tag {:0x} is already defined", tag))?
             }
-            self.def_list.push(Definition::new(tag, name, data_type, is_multiple));
+            // self.def_list.push(Definition::new(tag, name, data_type, is_multiple));
+            self.def_list.push(Definition::new(tag, name, data_type));
             Ok(())
         }
 
@@ -141,8 +144,6 @@ pub mod manager {
                     None => { return Err("Data type could not get")? },
                 }
                 
-                // Is multiple
-                b.get_child()?.add_bool(def.is_multiple);
                 // Explanation
                 b.get_child()?.add_str(&def.explanation)?;
                 // Children tags.
@@ -189,11 +190,8 @@ pub mod manager {
                 let name = b.get_child()?.read_str()?;
                 // Data type
                 let data_type: Type = Type::u8_to_type(b.get_child()?.read_u8());
-                // Is multiple
-                let is_multiple = b.get_child()?.read_u8() != 0;
-
                 // make new definition structure.
-                let mut def = Definition::new(tag, name, data_type, is_multiple);
+                let mut def = Definition::new(tag, name, data_type);
 
                 // Explanation
                 def.explanation = b.get_child()?.read_str()?;

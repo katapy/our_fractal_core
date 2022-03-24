@@ -97,8 +97,6 @@ pub mod definition {
         pub data_type: Type,
         /// explanation
         pub explanation: String,
-        /// is multiple.
-        pub is_multiple: bool,
 
         pub is_base: bool,
         /// tag number of children
@@ -106,18 +104,18 @@ pub mod definition {
     }
 
     impl Definition {
-        // Create new definition
-        pub fn new(tag: u32, name: String, data_type: Type, is_multiple: bool) -> Definition {
-            let vec: Vec<Child> = Vec::new();
+        /// Create new definition
+        /// * `tag` - definition tag.
+        /// * `name` - definition name.
+        /// * `data_type` - definition data type.
+        pub fn new(tag: u32, name: String, data_type: Type) -> Definition {
             Definition {
                 tag: tag,
                 name: name,
                 data_type: data_type,
                 explanation: format!(""),
-                is_multiple: is_multiple,
                 is_base: false,
-                // children: vec,
-                children: vec,
+                children: vec![],
             }
         }
 

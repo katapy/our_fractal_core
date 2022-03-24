@@ -3,7 +3,7 @@
 set -eux
 
 PROJ_NAME=$(cat Cargo.toml | grep -E "^name" | sed -E 's/name[[:space:]]=[[:space:]]"(.*)"/\1/g' | sed -E 's/-/_/g')
-rm -rf target/debug/deps/${PROJ_NAME}-*
+rm -rf target/debug/*
 
 export CARGO_INCREMENTAL=0
 export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off"
