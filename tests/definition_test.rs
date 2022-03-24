@@ -12,17 +12,17 @@ use speculate::speculate;
 speculate! {
     describe "definition" {
         it "def name" {
-            let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+            let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int);
             assert_eq!(def.get_name(), &format!("Int test"));
         }
 
         it "def is base" {
-            let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+            let def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int);
             assert_eq!(def.is_base(), false);
         }
 
         it "explanation" {
-            let mut def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int, false);
+            let mut def = Definition::new(0xaaaa_bbbb, format!("Int test"), Type::Int);
             def.set_explanation(format!("exp test"));
             assert_eq!(def.get_explanation(), &format!("exp test"));
         }

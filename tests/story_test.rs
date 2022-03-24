@@ -21,8 +21,8 @@ speculate! {
             let mut manager: Manager = Manager::new(path, "data_test".to_string(), "data_name".to_string());
 
             // 2. Add definition.
-            manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int, false).unwrap();
-            manager.add_def(0x1234_5678, format!("1234 data"), Type::String, false).unwrap();
+            manager.add_def(0xabcd_abcd, format!("abcd data"), Type::Int).unwrap();
+            manager.add_def(0x1234_5678, format!("1234 data"), Type::String).unwrap();
             manager.get_def_mut(&0xabcd_abcd).unwrap().children.push(Child::create(0x1234_5678, MultiType::Single));
 
             // 3. R/W definition on binary file.
