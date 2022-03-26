@@ -1,88 +1,15 @@
 
+
+pub mod child;
+pub mod data_type;
+pub mod multi_type;
+
 pub mod definition {
+    use crate::manager::data::definition::child::child::Child;
+    use crate::manager::data::definition::data_type::data_type::Type;
+    // use crate::manager::data::definition::multi_type::multi_type::MultiType;
 
-    use std::error;
-
-    use serde::{Serialize, Deserialize};
-
-    type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
-
-    #[derive(Debug, Clone)]
-    pub struct Child {
-        pub tag: u32,
-        pub multi_type: MultiType,
-    }
-
-    impl Child {
-        /// get multi type from u8 num.
-        pub fn get_multi_type_u8_num(&self) -> Result<u8> {
-            match self.multi_type {
-                MultiType::Single => Ok(0x00),
-                _ => Err("Multi type convert error")?
-            }
-        }
-        
-        /// create child.
-        /// * `tag` - Child tag.
-        /// * `tag` - Child multi type.
-        pub fn create(tag: u32, multu_type: MultiType) -> Child {
-            Child {
-                tag: tag,
-                multi_type: multu_type,
-            }
-        }
-
-        /// create child by binary data.
-        /// * `tag` - Child tag.
-        /// * `tag` - Child multi type which binary.
-        pub fn create_by_binary(tag: u32, multi_type_binnary: u8) -> Child {
-            let multi_type = match multi_type_binnary {
-                0x00 => MultiType::Single,
-                _ => MultiType::Err
-            };
-            Child {
-                tag: tag,
-                multi_type: multi_type,
-            }
-        }
-    }
-
-    /// type in data value
-    #[derive (Clone, Copy, Debug, Serialize, Deserialize)]
-    pub enum Type {
-        Int,
-        Float,
-        String,
-        Err,
-    }
-
-    impl Type {
-        pub fn u8_to_type(buf: u8) -> Type {
-            match buf {
-                0x00 => Type::Int,
-                0x01 => Type::Float,
-                0x02 => Type::String,
-                _ => Type::Err,
-            }
-        }
-    }
-
-    #[derive (Clone, Copy, Debug, Serialize, Deserialize)]
-    pub enum MultiType {
-        Single,
-        Dictionary,
-        Err,
-    }
-
-
-    impl MultiType {
-        pub fn u8_to_multi_type(buf: u8) -> MultiType {
-            match buf {
-                0x00 => MultiType::Single,
-                _ => MultiType::Err,
-            }
-        }
-    }
+    // use serde::{Serialize, Deserialize};
 
     /// Data definition
     #[derive(Debug, Clone)]

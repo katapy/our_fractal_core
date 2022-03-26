@@ -4,11 +4,12 @@ pub mod manager;
 // use manager::manager::{Manager, static_manager};
 use manager::manager::{Manager};
 use manager::data::data::Data;
-use manager::data::definition::definition::{Definition, Type, Child};
+use manager::data::definition::data_type::data_type::Type;
+use manager::data::definition::child::child::Child;
 
 use std::path::PathBuf;
 
-use crate::manager::data::definition::definition::MultiType;
+use crate::manager::data::definition::multi_type::multi_type::MultiType;
 
 #[tokio::main]
 async fn main() {
@@ -67,7 +68,7 @@ async fn main() {
     println!("Def2[0x1234_5678]: {:?}", manager.get_def(&0x1234_5678).unwrap());
 
     // 5. Add child data.
-    let mut vec: &mut Vec<Child> = &mut Vec::new();
+    // let mut vec: &mut Vec<Child> = &mut Vec::new();
     manager.add_child(
         &mut Data::new( 
             (*manager.get_def(&0xabcd_abcd).unwrap()).clone(), 

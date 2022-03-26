@@ -2,7 +2,8 @@
 pub mod definition;
 
 pub mod data {
-    use crate::manager::data::definition::definition::{Definition, Type};
+    use crate::manager::data::definition::definition::Definition;
+    use crate::manager::data::definition::data_type::data_type::Type;
 
     use std::error;
     use std::any::{Any};

@@ -4,7 +4,9 @@ pub mod io_for_db;
 
 pub mod manager {
     
-    use crate::manager::data::definition::definition::{Definition, Type, Child};
+    use crate::manager::data::definition::definition::Definition;
+    use crate::manager::data::definition::child::child::Child;
+    use crate::manager::data::definition::data_type::data_type::Type;
     use crate::manager::data::data::{Data, DataRoot};
     use crate::manager::io_for_db::path_manager::path_manager::PathManager;
     use crate::manager::io_for_db::io::{BinaryManager, Mode, u128_to_slice};
