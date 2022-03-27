@@ -17,9 +17,10 @@ jobs:
           command: "cargo test" 
       - run:
           name: cargo build release
-          command: "cargo build --release" 
+          command: "cargo build --release"
       - run:
-          name: folder
-          command: "ls"
+          command: |
+            mkdir -p /tmp/modules
+            cp /target/release/libour_fractal_core.rlib /tmp/modules
       - store_artifacts:
-          path: /target/release
+          path: /tmp/modules
