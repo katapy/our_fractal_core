@@ -15,3 +15,8 @@ jobs:
       - run:
           name: Run test
           command: "cargo test" 
+      - run:
+          name: cargo build release
+          command: "cargo build --release" 
+      - store_artifacts:
+          path: /target/release/libour_fractal_core.rlib
