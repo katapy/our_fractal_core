@@ -18,5 +18,8 @@ jobs:
       - run:
           name: cargo build release
           command: "cargo build --release" 
+      - run:
+          name: folder
+          command: "ls"
       - store_artifacts:
           path: /target/release
