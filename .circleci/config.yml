@@ -21,6 +21,6 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/modules
-            cp /target/release/libour_fractal_core.rlib /tmp/modules
+            cp ./target/release/libour_fractal_core.rlib /tmp/modules
       - store_artifacts:
           path: /tmp/modules
